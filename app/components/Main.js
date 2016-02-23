@@ -15,8 +15,8 @@ import {Contact, ContactCreate, ContactEdit, ContactDelete} from './Contacts';
 //--------------------------------------------------------------------------
 //  DreamFactory 2.0 instance specific constants
 //--------------------------------------------------------------------------
-const INSTANCE_URL = 'https://df-reactdemo.enterprise.dreamfactory.com';
-const APP_API_KEY = 'a1f0a8d1ccd99aed2cffbd249c6e21e08b400db5c62a795705570504ed1011a7';
+const INSTANCE_URL = '';
+const APP_API_KEY = '';
 const VERSION = '1.0.0';
 
 //--------------------------------------------------------------------------
