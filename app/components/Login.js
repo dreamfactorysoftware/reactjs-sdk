@@ -2,9 +2,9 @@
 //--------------------------------------------------------------------------
 //  Import modules
 //--------------------------------------------------------------------------
-import React from 'react';
+import React, {PropTypes} from 'react';
 import {Router, Link, hashHistory} from 'react-router';
-
+import {Modal, ModalClose} from 'react-modal-bootstrap';
 
 //--------------------------------------------------------------------------
 //  Login
@@ -25,7 +25,16 @@ var Header = React.createClass({
 
 var LoginForm = React.createClass({
 	getInitialState: function() {
-    	return {value_email: '', value_password: ''};
+    	return {
+            value_email: '', 
+            value_password: '',
+            isOpen: false,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            }
+        };
   	},
 	handleClick: function(event){
         var url = this.props.url;
@@ -41,13 +50,31 @@ var LoginForm = React.createClass({
                 }),
                 cache:false,
                 method:'POST',
-                success:function (response) {
+                success: function(response) {
                 	var session_token = response.session_token;
                 	localStorage.setItem('session_token', session_token);
                     hashHistory.push('/groups');
-                }
+                },
+                error: function(response) {
+                    console.log(response)
+                    this.setState({
+                        modalContent: {
+                            headline: response.statusText,
+                            body: response.responseJSON.error.message,
+                            extended: response.responseText
+                        }
+                    })
+                    
+                    this.openModal();
+                }.bind(this)
             });
         }
+    },
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
     },
     handleChange: function (name, e) {
       var change = {};
@@ -74,7 +101,7 @@ var LoginForm = React.createClass({
                                 <button id="signin" className="btn btn-default login-btn-signin" type="button" onClick={this.handleClick}>Sign In</button>
                             </div>
                             <div className="form-group form-control-size" >
-                            	<Link className="btn btn-default login-btn-register" to="/register" >Register</Link>
+                            	<Link className="btn btn-default login-btn-register" to="/register">Register</Link>
                             </div>
                         </form>
                         <div className="row">
@@ -83,6 +110,13 @@ var LoginForm = React.createClass({
                     </div>
                 </div>
                 <div className="col-md-2"></div>
+                <ErrorModal 
+                    isOpen={this.state.isOpen} 
+                    headline={this.state.modalContent.headline}
+                    body={this.state.modalContent.body}
+                    extended={this.state.modalContent.extended}
+                    closeModal={this.closeModal}
+                />
             </div>
 		);
 	}
@@ -136,6 +170,44 @@ var Logout = React.createClass({
         return (
             <div></div>
         );
+    }
+});
+
+
+//--------------------------------------------------------------------------
+//  Modal Messages
+//--------------------------------------------------------------------------
+var ErrorModal = React.createClass({
+    hideModal: function() {
+        this.props.closeModal();
+    },
+    render: function() {
+        var { isOpen, headline, body, extended } = this.props;
+
+        return (
+            <Modal isOpen={isOpen} onRequestHide={this.hideModal}>
+                <div className='modal-header'>
+                    <ModalClose onClick={this.hideModal}/>
+                    <h4 className='modal-title'>{headline}</h4>
+                </div>
+                <div className='modal-body'>
+                    <p>{body}</p>
+                    <div>
+                        <button className="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseError" aria-expanded="false" aria-controls="collapseError">
+                            <h6>Show/hide full message</h6>
+                        </button>
+                        <div className="collapse" id="collapseError">
+                            <div className="well" id="errorMsg">{extended}</div>
+                        </div>
+                    </div>
+                </div>
+                <div className='modal-footer'>
+                    <button className='btn btn-default' onClick={this.hideModal}>
+                        Close
+                    </button>
+                </div>
+            </Modal>
+        )
     }
 });
 

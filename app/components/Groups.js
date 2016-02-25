@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Link, hashHistory} from 'react-router';
 import {Table, Column, Cell} from 'fixed-data-table';
-
+import {Modal, ModalClose} from 'react-modal-bootstrap';
 
 //--------------------------------------------------------------------------
 //  Groups
@@ -51,7 +51,13 @@ var GroupsTable = React.createClass({
     		filteredDataList: [],
     		filteredData: [],
     	    tableWidth: 100,
-            tableHeight: 100
+            tableHeight: 100,
+            isOpen: false,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            }
         }
   	},
     loadGroups: function(){
@@ -71,20 +77,35 @@ var GroupsTable = React.createClass({
             },
             success:function (response) {
                     if (response.hasOwnProperty('resource')) {
-                        this.setState({data: response.resource});
-                        
+                        var sortedData = response.resource.sort(function(a, b) {
+                            return a.name.localeCompare(b.name);
+                        })
+
+                        this.setState({data: sortedData});
+
                         this._update();
                         
                         this.setState({
-					      	filteredDataList: response.resource
+					      	filteredDataList: sortedData
 					    });
 
 					    this.setState({
-					      	filteredData: response.resource
+					      	filteredData: sortedData
 					    });
                     }
                     else
                         console.log(response);
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -93,10 +114,13 @@ var GroupsTable = React.createClass({
  	}, 
  	componentDidMount: function(){ 	
  		this._update();
- 	},
- 	componentDidUpdate: function(){
-
- 	}, 	
+ 	},	
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
+    },
   	_update() {
 		this.setState({
         	tableWidth  : groups_search.offsetWidth,
@@ -135,6 +159,12 @@ var GroupsTable = React.createClass({
     	var row = this.state.filteredData[index];
 		hashHistory.push('/group/' + row.id);
   	},
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
+    },
 	render: function() {
 		return (
 			<div>
@@ -171,6 +201,13 @@ var GroupsTable = React.createClass({
 					</Table>
 	        	</div>
 	        	<div className="col-md-2"></div>
+                <ErrorModal 
+                    isOpen={this.state.isOpen} 
+                    headline={this.state.modalContent.headline}
+                    body={this.state.modalContent.body}
+                    extended={this.state.modalContent.extended}
+                    closeModal={this.closeModal}
+                />
 	        </div>
 		);
 	}
@@ -249,11 +286,18 @@ var GroupTable = React.createClass({
 	getInitialState: function() {
     	return {
             data: [],
+            groupName: '',
     		selected:[],
     		filteredDataList: [],
     		filteredData: [],
     	    tableWidth  : 100,
-            tableHeight : 100
+            tableHeight : 100,
+            isOpen: false,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            }
         }
   	},
     _onFilterChange(e) {
@@ -285,6 +329,46 @@ var GroupTable = React.createClass({
 			filteredDataList: filteredIndexes
 		});
 	},
+    loadGroupName: function() {
+        var url = this.props.url;
+        var key = this.props.apikey;
+        var groupId = this.props.groupId;
+        var token = localStorage.getItem('session_token');
+
+        $.ajax({
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            url: url + '/api/v2/db/_table/contact_group/' + groupId,
+            data: null,
+            cache:false,
+            method:'GET',
+            headers: {
+                "X-DreamFactory-API-Key": key,
+                "X-DreamFactory-Session-Token": token
+            },
+            success: function(response) {
+                if (response.hasOwnProperty('name')) {
+                    var groupName = response.name;
+
+                    this.setState({
+                        groupName: groupName
+                    });
+                }
+                this.loadRelationship();
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
+            }.bind(this)
+        });
+    },
     loadRelationship: function(){
     	var url = this.props.url;
 		var key = this.props.apikey;
@@ -323,6 +407,17 @@ var GroupTable = React.createClass({
                 }
                 else
                     console.log(response);
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -346,38 +441,50 @@ var GroupTable = React.createClass({
             },
             success:function (response) {
                     if (response.hasOwnProperty('resource')) {
-                        this.setState({data: response.resource});
+                        var sortedData = response.resource.sort(function(a, b) {
+                            return a.first_name.localeCompare(b.first_name);
+                        })
+
+                        this.setState({data: sortedData});
 
                         this._update();
 
                         this.setState({
-					      	filteredDataList: response.resource
+					      	filteredDataList: sortedData
 					    });
 
 					    this.setState({
-					      	filteredData: response.resource
+					      	filteredData: sortedData
 					    });
                     }
                     else
                         console.log(response);
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
     componentWillMount: function(){
- 		this.loadRelationship();
+        this.loadGroupName();
  	}, 
- 	componentWillUnmount() {
- 		this._update();
-    },
- 	componentDidUpdate: function(){
-
- 	},
  	componentDidMount: function(){
         this._update();
  	},
- 	componentWillReceiveProps(props) {
-    	this._update();
-  	},
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
+    },
   	_update() {
 		var tableHeight = this.state.data.length*50+2;
 
@@ -405,13 +512,14 @@ var GroupTable = React.createClass({
 				<div className="row vert-offset-top-30"></div>
 	            <div className="col-md-2"></div>
 	            <div className="col-md-8">
+                    <div className="text-center"><h2>{this.state.groupName}</h2></div>
 	            	<div className="input-group" id="group_search">
                         <div className="input-group-addon">
                             <span className="glyphicon glyphicon-search" aria-hidden="true"></span>
                         </div>
                         <input type="text" id="table_groups_search" className="form-control" placeholder="Search for groups" onChange={this._onFilterChange} />
                     </div>
-
+                    <div className="row vert-offset-top-25"></div>
 					<Table
 						rowsCount={this.state.filteredData.length}
 						rowHeight={50}
@@ -435,6 +543,13 @@ var GroupTable = React.createClass({
       				</Table>
 	        	</div>
 	        	<div className="col-md-2"></div>
+                <ErrorModal 
+                    isOpen={this.state.isOpen} 
+                    headline={this.state.modalContent.headline}
+                    body={this.state.modalContent.body}
+                    extended={this.state.modalContent.extended}
+                    closeModal={this.closeModal}
+                />
 	        </div>
 		);
 	}
@@ -503,7 +618,13 @@ var GroupCreateTable = React.createClass({
             tableWidth  : 100,
             tableHeight : 100,
             groupName: '',
-            storedGroupID: 0 
+            storedGroupID: 0,
+            isOpen: false,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            } 
         }
     },
     handleClick: function(event){
@@ -568,20 +689,37 @@ var GroupCreateTable = React.createClass({
             },
             success:function (response) {
                 if (response.hasOwnProperty('resource')) {
-                    this.setState({data: response.resource});
+                    var sortedData = response.resource.sort(function(a, b) {
+                        return a.first_name.localeCompare(b.first_name);
+                    })
+
+                    this.setState({
+                        data: sortedData
+                    });
                     
                     this._update();
 
                     this.setState({
-                        filteredDataList: response.resource
+                        filteredDataList: sortedData
                     });
 
                     this.setState({
-                        filteredData: response.resource
+                        filteredData: sortedData
                     });
                 }
                 else
                     console.log(response);
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -593,7 +731,13 @@ var GroupCreateTable = React.createClass({
 
     },
     componentDidMount: function(){
-
+        this._update();
+    },
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
     },
     _update() {
         var tableHeight = this.state.data.length*50+2;
@@ -647,6 +791,17 @@ var GroupCreateTable = React.createClass({
                     }
                     else 
                         console.log(response);
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -678,7 +833,18 @@ var GroupCreateTable = React.createClass({
                 },
                 success:function (response) {
 
-                }
+                },
+                error: function(response) {
+                    this.setState({
+                        modalContent: {
+                            headline: response.statusText,
+                            body: response.responseJSON.error.message,
+                            extended: response.responseText
+                        }
+                    })
+                    
+                    this.openModal();
+                }.bind(this)
             });
         };
 
@@ -710,6 +876,7 @@ var GroupCreateTable = React.createClass({
                         </div>
                         <input type="text" id="table_groups_search" className="form-control" placeholder="Search for groups" onChange={this._onFilterChange} />
                     </div>
+                    <div className="row vert-offset-top-25"></div>
                     <Table
                         rowsCount={this.state.filteredData.length}
                         rowHeight={50}
@@ -745,6 +912,13 @@ var GroupCreateTable = React.createClass({
                     </Table>
                 </div>
                 <div className="col-md-2"></div>
+                <ErrorModal 
+                    isOpen={this.state.isOpen} 
+                    headline={this.state.modalContent.headline}
+                    body={this.state.modalContent.body}
+                    extended={this.state.modalContent.extended}
+                    closeModal={this.closeModal}
+                />
             </div>
         );
     }
@@ -777,7 +951,13 @@ var GroupDelete = React.createClass({
     getInitialState: function() {
         return {
             ids: '',
-            relations: []
+            relations: [],
+            isOpen: false,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            }
         }
     },
     deleteGroup: function() {
@@ -799,6 +979,17 @@ var GroupDelete = React.createClass({
             },
             success:function (response) {
                 this.getGroupRelations();
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });        
     },
@@ -841,6 +1032,17 @@ var GroupDelete = React.createClass({
                     }
                     
                 }
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
 
@@ -869,7 +1071,18 @@ var GroupDelete = React.createClass({
                 },
                 success:function (response) {
 
-                }
+                },
+                error: function(response) {
+                    this.setState({
+                        modalContent: {
+                            headline: response.statusText,
+                            body: response.responseJSON.error.message,
+                            extended: response.responseText
+                        }
+                    })
+                    
+                    this.openModal();
+                }.bind(this)
             });
         }
 
@@ -877,6 +1090,12 @@ var GroupDelete = React.createClass({
     },
     componentWillMount: function(){
         this.deleteGroup();
+    },
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
     },
     render: function() {
         var { url, apikey, groupId } = this.props;
@@ -934,17 +1153,24 @@ var GroupEditTable = React.createClass({
             filteredData: [],
             tableWidth  : 100,
             tableHeight : 100,
-            groupName: ''
+            groupName: '',
+            isOpen: false,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            }
         }
     },
     handleClick: function(event){
-        var {checked, value} = event.target;   
+        var value = event.target.value; 
+        var checked = event.target.checked;   
         var selectedCheckboxes = this.state.selected;
 
-        if ( checked && selectedCheckboxes.indexOf(value) < 0 ) {
-          selectedCheckboxes.push(parseInt(value));
+        if ( checked && selectedCheckboxes.indexOf(parseInt(value)) < 0 ) {
+            selectedCheckboxes.push(parseInt(value));
         } else {
-          selectedCheckboxes.splice(selectedCheckboxes.indexOf(value), 1);
+            selectedCheckboxes.splice(selectedCheckboxes.indexOf(parseInt(value)), 1);
         }  
 
         this.setState({
@@ -1000,22 +1226,39 @@ var GroupEditTable = React.createClass({
                 "X-DreamFactory-API-Key": key,
                 "X-DreamFactory-Session-Token": token
             },
-            success:function (response) {
+            success: function (response) {
                 if (response.hasOwnProperty('resource')) {
-                    this.setState({data: response.resource});
+                    var sortedData = response.resource.sort(function(a, b) {
+                        return a.first_name.localeCompare(b.first_name);
+                    })
+
+                    this.setState({
+                        data: sortedData
+                    });
 
                     this._update();
 
                     this.setState({
-                        filteredDataList: response.resource
+                        filteredDataList: sortedData
                     });
 
                     this.setState({
-                        filteredData: response.resource
+                        filteredData: sortedData
                     });
                 }
                 else
                     console.log(response);
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -1026,6 +1269,12 @@ var GroupEditTable = React.createClass({
     }, 
     componentDidMount: function(){
         this._update();
+    },
+    openModal: function() {
+        this.setState({isOpen: true});
+    },
+    closeModal: function() {
+        this.setState({isOpen: false})
     },
     fillTable: function(){
         var url = this.props.url;
@@ -1062,6 +1311,17 @@ var GroupEditTable = React.createClass({
                         this.setState({selected: contactIds});
                     }                    
                 }
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -1070,8 +1330,6 @@ var GroupEditTable = React.createClass({
         var key = this.props.apikey;
         var groupId = this.props.groupId;
         var token = localStorage.getItem('session_token');
-
-        var params = 'filter=contact_group_id%3D' + groupId + '&fields=contact_id';
 
         $.ajax({
             dataType: 'json',
@@ -1084,7 +1342,7 @@ var GroupEditTable = React.createClass({
                 "X-DreamFactory-API-Key": key,
                 "X-DreamFactory-Session-Token": token
             },
-            success:function (response) {
+            success: function(response) {
                 if (response.hasOwnProperty('name')) {
                     var groupName = response.name;
 
@@ -1092,6 +1350,17 @@ var GroupEditTable = React.createClass({
                         groupName: groupName
                     });
                 }
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -1136,6 +1405,17 @@ var GroupEditTable = React.createClass({
             },
             success:function (response) {
                 this.removeGroupRelations();
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -1159,6 +1439,17 @@ var GroupEditTable = React.createClass({
             },
             success:function (response) {
                 this.saveGroupRelations()
+            }.bind(this),
+            error: function(response) {
+                this.setState({
+                    modalContent: {
+                        headline: response.statusText,
+                        body: response.responseJSON.error.message,
+                        extended: response.responseText
+                    }
+                })
+                
+                this.openModal();
             }.bind(this)
         });
     },
@@ -1190,7 +1481,18 @@ var GroupEditTable = React.createClass({
                 },
                 success:function (response) {
 
-                }
+                },
+                error: function(response) {
+                    this.setState({
+                        modalContent: {
+                            headline: response.statusText,
+                            body: response.responseJSON.error.message,
+                            extended: response.responseText
+                        }
+                    })
+                    
+                    this.openModal();
+                }.bind(this)
             });
         }
 
@@ -1222,6 +1524,7 @@ var GroupEditTable = React.createClass({
                         </div>
                         <input type="text" id="table_groups_search" className="form-control" placeholder="Search for groups" onChange={this._onFilterChange} />
                     </div>
+                    <div className="row vert-offset-top-25"></div>
                     <Table
                         rowsCount={this.state.filteredData.length}
                         rowHeight={50}
@@ -1266,6 +1569,13 @@ var GroupEditTable = React.createClass({
                     </Table>
                 </div>
                 <div className="col-md-2"></div>
+                <ErrorModal 
+                    isOpen={this.state.isOpen} 
+                    headline={this.state.modalContent.headline}
+                    body={this.state.modalContent.body}
+                    extended={this.state.modalContent.extended}
+                    closeModal={this.closeModal}
+                />
             </div>
         );
     }
@@ -1287,6 +1597,44 @@ var GroupEdit = React.createClass({
                 </div>
             </div>
         );
+    }
+});
+
+
+//--------------------------------------------------------------------------
+//  Modal Messages
+//--------------------------------------------------------------------------
+var ErrorModal = React.createClass({
+    hideModal: function() {
+        this.props.closeModal();
+    },
+    render: function() {
+        var { isOpen, headline, body, extended } = this.props;
+
+        return (
+            <Modal isOpen={isOpen} onRequestHide={this.hideModal}>
+                <div className='modal-header'>
+                    <ModalClose onClick={this.hideModal}/>
+                    <h4 className='modal-title'>{headline}</h4>
+                </div>
+                <div className='modal-body'>
+                    <p>{body}</p>
+                    <div>
+                        <button className="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseError" aria-expanded="false" aria-controls="collapseError">
+                            <h6>Show/hide full message</h6>
+                        </button>
+                        <div className="collapse" id="collapseError">
+                            <div className="well" id="errorMsg">{extended}</div>
+                        </div>
+                    </div>
+                </div>
+                <div className='modal-footer'>
+                    <button className='btn btn-default' onClick={this.hideModal}>
+                        Close
+                    </button>
+                </div>
+            </Modal>
+        )
     }
 });
 
