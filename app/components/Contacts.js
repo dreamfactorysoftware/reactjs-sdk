@@ -32,7 +32,7 @@ var HeaderContact = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                	<div className="col-md-4 pull-left">
                     <ul className="nav navbar-nav">
                     <li className="pull-left"><button type="button" id="contact_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
@@ -255,7 +255,7 @@ var HeaderContactCreate = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                	<div className="col-md-4 pull-left">
                     <ul className="nav navbar-nav">
                     <li className="pull-left"><button type="button" id="contact_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
@@ -641,7 +641,7 @@ var HeaderContactEdit = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                 <div className="col-md-4 pull-left">
                     <ul className="nav navbar-nav">
                     <li className="pull-left"><button type="button" id="contact_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>

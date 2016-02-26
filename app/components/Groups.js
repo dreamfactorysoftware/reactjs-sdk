@@ -24,7 +24,7 @@ var HeaderGroups = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                	<div className="col-md-4 pull-left">
                		<ul className="nav navbar-nav">
                     <li className="pull-left"><button type="button" id="groups_menu_logout" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Logout</button></li>
@@ -115,12 +115,6 @@ var GroupsTable = React.createClass({
  	componentDidMount: function(){ 	
  		this._update();
  	},	
-    openModal: function() {
-        this.setState({isOpen: true});
-    },
-    closeModal: function() {
-        this.setState({isOpen: false})
-    },
   	_update() {
 		this.setState({
         	tableWidth  : groups_search.offsetWidth,
@@ -260,7 +254,7 @@ var HeaderGroup = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                	<div className="col-md-4 pull-left">
                		<ul className="nav navbar-nav">
                     <li className="pull-left"><button type="button" id="group_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
@@ -592,7 +586,7 @@ var HeaderGroupCreate = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                 <div className="col-md-4 pull-left">
                     <ul className="nav navbar-nav">
                         <li className="pull-left"><button type="button" id="group_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
@@ -1126,7 +1120,7 @@ var HeaderGroupEdit = React.createClass({
     },
     render: function () {
         return (
-            <div className="navbar navbar-fixed-top df-nav cen col-md-12">
+            <div className="navbar navbar-default navbar-static-top cen">
                 <div className="col-md-4 pull-left">
                     <ul className="nav navbar-nav">
                     <li className="pull-left"><button type="button" id="group_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
