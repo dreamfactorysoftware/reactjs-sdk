@@ -12,6 +12,30 @@ import {Modal, ModalClose} from 'react-modal-bootstrap';
 //  Show Contact
 //--------------------------------------------------------------------------
 var HeaderContact = React.createClass({
+    getInitialState: function() {
+        return {
+            isOpen: false,
+            confirm: true,
+            modalContent: {
+                headline: '',
+                body: '',
+                extended: ''
+            }
+        }
+    },
+    modalConfirm: function() {
+        this.setState({
+            isOpen: false,
+        })
+
+        var contactId = this.props.contactId;
+        hashHistory.push('/contact/' + contactId + '/delete');
+    },
+    modalClose: function() {
+        this.setState({
+            isOpen: false,
+        })
+    },
 	handleClick: function(event){
 		var contactId = this.props.contactId;
 
@@ -26,28 +50,48 @@ var HeaderContact = React.createClass({
 				hashHistory.push('/contact/' + contactId + '/edit');
 				break;	
 			case 'contact_menu_delete':
-				hashHistory.push('/contact/' + contactId + '/delete');
+                this.setState({
+                    modalContent: {
+                        headline: 'Delete Contact',
+                        body: 'Do you want to delete this contact?',
+                        extended: ''
+                    }
+                })
+                this.setState({
+                    isOpen: true,
+                })
 				break;	
 		}
     },
     render: function () {
         return (
-            <div className="navbar navbar-default navbar-static-top cen">
-               	<div className="col-md-4 pull-left">
-                    <ul className="nav navbar-nav">
-                    <li className="pull-left"><button type="button" id="contact_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
-                    <li className="pull-left"><button type="button" id="contact_menu_logout" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Logout</button></li>
-                    </ul>
-                </div> 
-               	<div className="col-md-4">
-               		<img src="./img/DreamFactory-logo-horiz.png" className="header-logo-align" height="25" />
-               	</div> 
-               	<div className="col-md-4">
-                    <ul className="nav navbar-nav pull-right">
-               		   <li className="pull-right"><button type="button" id="contact_menu_edit" className="btn btn-default btn-menu" onClick={this.handleClick}>Edit Contact</button></li>
-                        <li className="pull-right"><button type="button" id="contact_menu_delete" className="btn btn-default btn-menu" onClick={this.handleClick}>Delete Contact</button></li>
-                    </ul>
-               	</div> 
+            <div>
+                <div className="navbar navbar-default navbar-static-top cen">
+                   	<div className="col-md-4 pull-left">
+                        <ul className="nav navbar-nav">
+                        <li className="pull-left"><button type="button" id="contact_menu_back" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Back</button></li>
+                        <li className="pull-left"><button type="button" id="contact_menu_logout" className="btn btn-default btn-menu-logout" onClick={this.handleClick}>Logout</button></li>
+                        </ul>
+                    </div> 
+                   	<div className="col-md-4">
+                   		<img src="./img/DreamFactory-logo-horiz.png" className="header-logo-align" height="25" />
+                   	</div> 
+                   	<div className="col-md-4">
+                        <ul className="nav navbar-nav pull-right">
+                   		   <li className="pull-right"><button type="button" id="contact_menu_edit" className="btn btn-default btn-menu" onClick={this.handleClick}>Edit Contact</button></li>
+                            <li className="pull-right"><button type="button" id="contact_menu_delete" className="btn btn-default btn-menu" onClick={this.handleClick}>Delete Contact</button></li>
+                        </ul>
+                   	</div> 
+                </div>
+                <ErrorModal 
+                    isOpen={this.state.isOpen} 
+                    headline={this.state.modalContent.headline}
+                    body={this.state.modalContent.body}
+                    extended={this.state.modalContent.extended}
+                    closeModal={this.modalClose}
+                    confirmModal={this.modalConfirm}
+                    confirm={this.state.confirm}
+                />
             </div>
         );
     }
@@ -1325,6 +1369,17 @@ var ContactDelete = React.createClass({
 //--------------------------------------------------------------------------
 //  Modal Messages
 //--------------------------------------------------------------------------
+var If = React.createClass({
+    render: function() {
+        if (this.props.confirm) {
+            return this.props.children;
+        }
+        else {
+            return false;
+        }
+    }
+});
+
 var ErrorModal = React.createClass({
     hideModal: function() {
         this.props.closeModal();
@@ -1350,6 +1405,9 @@ var ErrorModal = React.createClass({
                     </div>
                 </div>
                 <div className='modal-footer'>
+                <If confirm={confirm}>
+                        <button className='btn btn-primary' onClick={this.props.confirmModal}>OK</button>
+                    </If>
                     <button className='btn btn-default' onClick={this.hideModal}>
                         Close
                     </button>
