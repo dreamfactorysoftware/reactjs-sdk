@@ -542,7 +542,8 @@ var GroupTable = React.createClass({
     },
     _onRowSelect: function(e, index) {
     	var contact = this.state.data[index];
-        hashHistory.push('/contact/' + contact.id);
+        var groupId = this.props.groupId;
+        hashHistory.push('/contact/' + contact.id + '?group=' + groupId);
   	},
 	render: function() {
 		return (

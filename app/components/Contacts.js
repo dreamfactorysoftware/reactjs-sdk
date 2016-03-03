@@ -28,8 +28,17 @@ var HeaderContact = React.createClass({
             isOpen: false,
         })
 
+        var url = location.href;
+        var param = 'group'
+        param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+
+        var regexS = "[\\?&]"+param+"=([^&#]*)";
+        var regex = new RegExp( regexS );
+        var urlparams = regex.exec( url );
+
         var contactId = this.props.contactId;
-        hashHistory.push('/contact/' + contactId + '/delete');
+
+        hashHistory.push('/contact/' + contactId + '/delete?group=' + urlparams[1]);
     },
     modalClose: function() {
         this.setState({
@@ -44,10 +53,26 @@ var HeaderContact = React.createClass({
 				hashHistory.push('/login');
 				break;	
 			case 'contact_menu_back':
-				hashHistory.push('/groups');
+                var url = location.href;
+                var param = 'group'
+                param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+
+                var regexS = "[\\?&]"+param+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var urlparams = regex.exec( url );
+
+                hashHistory.push('/group/' + urlparams[1]);
 				break;	
 			case 'contact_menu_edit':
-				hashHistory.push('/contact/' + contactId + '/edit');
+                var url = location.href;
+                var param = 'group'
+                param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+
+                var regexS = "[\\?&]"+param+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var params = regex.exec( url );
+
+				hashHistory.push('/contact/' + contactId + '/edit?group=' + params[1]);
 				break;	
 			case 'contact_menu_delete':
                 this.setState({
@@ -559,7 +584,7 @@ var ContactCreateForm = React.createClass({
     },
 	render: function() {
         var self = this;
-        
+
 		return (
 			<div>
 				<div className="row vert-offset-top-30"></div>
@@ -998,7 +1023,16 @@ var ContactEditForm = React.createClass({
             });
         }
 
-        hashHistory.push('/groups');
+        var contactId = this.props.contactId;
+        var url = location.href;
+        var param = 'group'
+        param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+
+        var regexS = "[\\?&]"+param+"=([^&#]*)";
+        var regex = new RegExp( regexS );
+        var urlparams = regex.exec( url );
+
+        hashHistory.push('/contact/' + contactId + '?group=' + urlparams[1]);
     },
     updateContactData: function() {
         var url = this.props.url;
@@ -1107,8 +1141,15 @@ var ContactEditForm = React.createClass({
     },
     _onCancelClick: function() {
         var contactId = this.props.contactId;
+        var url = location.href;
+        var param = 'group'
+        param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+
+        var regexS = "[\\?&]"+param+"=([^&#]*)";
+        var regex = new RegExp( regexS );
+        var params = regex.exec( url );
         
-        hashHistory.push('/contact/' + contactId);
+        hashHistory.push('/contact/' + contactId + '?group=' + params[1]);
     },
     openModal: function() {
         this.setState({isOpen: true});
@@ -1290,7 +1331,15 @@ var ContactDelete = React.createClass({
                 "X-DreamFactory-Session-Token": token
             },
             success:function (response) {
-                hashHistory.push('/groups');
+                var url = location.href;
+                var param = 'group'
+                param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+
+                var regexS = "[\\?&]"+param+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var urlparams = regex.exec( url );
+
+                hashHistory.push('/group/' + urlparams[1]);
             },
             error: function(response) {
                 this.setState({
@@ -1385,7 +1434,7 @@ var ErrorModal = React.createClass({
         this.props.closeModal();
     },
     render: function() {
-        var { isOpen, headline, body, extended } = this.props;
+        var { isOpen, headline, body, extended, confirm } = this.props;
 
         return (
             <Modal isOpen={isOpen} onRequestHide={this.hideModal}>
