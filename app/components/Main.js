@@ -17,7 +17,7 @@ import {Contact, ContactCreate, ContactEdit, ContactDelete} from './Contacts';
 //--------------------------------------------------------------------------
 const INSTANCE_URL = '';
 const APP_API_KEY = '';
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 
 //--------------------------------------------------------------------------
 //  Route Wrappers

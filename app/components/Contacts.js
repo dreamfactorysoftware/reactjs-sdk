@@ -126,6 +126,7 @@ var ContactForm = React.createClass({
 	getInitialState: function() {
     	return {
             data: [],
+            id: 0,
     		firstName: '',
     		lastName: '',
     		twitter: '',
@@ -173,6 +174,7 @@ var ContactForm = React.createClass({
             },
             success:function (response) {
                 if (response.hasOwnProperty('resource')) {
+                    this.setState({id: response.resource[0].id});
                     this.setState({firstName: response.resource[0].first_name});
                     this.setState({lastName: response.resource[0].last_name});
                     this.setState({notes: response.resource[0].notes});
@@ -758,6 +760,7 @@ var ContactEditForm = React.createClass({
     getInitialState: function() {
         return {
             data: [],
+            id: 0,
             firstName: '',
             lastName: '',
             twitter: '',
@@ -797,6 +800,7 @@ var ContactEditForm = React.createClass({
             },
             success:function (response) {
                 if (response.hasOwnProperty('resource')) {
+                    this.setState({id: response.resource[0].id});
                     this.setState({firstName: response.resource[0].first_name});
                     this.setState({lastName: response.resource[0].last_name});
                     this.setState({notes: response.resource[0].notes});
@@ -863,6 +867,14 @@ var ContactEditForm = React.createClass({
     },
     onInfosChanged: function(infos) {
         var info = this.state.infos;
+        var objId = null;
+
+        for(var i = 0; i < info.length; i += 1) {
+            if(info[i]['id'] === infos.id) {
+                objId = i;
+            }
+        }
+
         var updId = infos.id;
         var updName = infos.name;
         var updValue = infos.value;
@@ -870,7 +882,7 @@ var ContactEditForm = React.createClass({
         var updatedInfos = {};
         updatedInfos[updName] = updValue;
 
-        info[updId] = this.mergeObj(info[updId], updatedInfos);
+        info[objId] = this.mergeObj(info[objId], updatedInfos);
 
         this.setState({infos: info});
     },
