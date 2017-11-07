@@ -39,7 +39,7 @@ To download and install DreamFactory, follow the instructions [here](http://wiki
     - Click the Import button. If successful, your app will appear on the Apps tab. You may have to refresh the page to see your new app in the list.
         
 - Decide if you're going to run the app locally or load it from the instance.
-    - For running locally you clone the repo to your machine and open index.html in the browser. If running locally you need to set the URL for your instance so the app can make the API calls. Go to your local repo and edit script.js. Set the constant INSTANCE_URL to point to your DreamFactory instance such as http://localhost:8080.
+    - For running locally you clone the repo to your machine and open index.html in the browser. If running locally you need to set the URL for your instance so the app can make the API calls. Go to your local repo and edit app/components/Main.js. Set the constant INSTANCE_URL to point to your DreamFactory instance such as http://localhost:8080.
     - For running from the instance you launch the app directly from the Apps tab in the admin console.  Leave INSTANCE_URL set to empty string.
 
 - If running from instance make your app files public.
@@ -49,7 +49,7 @@ To download and install DreamFactory, follow the instructions [here](http://wiki
 
 - Edit your app API key
     - If you are running from instance use the file manager to edit public/bundle.js and set APP_API_KEY to the key for your new app. The API key is shown on the app details in the Apps tab of the admin console.
-    - If you are running locally edit script.js in your local repo.
+    - If you are running locally edit app/components/Main.js in your local repo.
     
 - Make sure you have a SQL database service named 'db'. Most DreamFactory instances have a default 'db' service for SQLite. You can add one by going to the Services tab in the admin console and creating a new SQL service. Make sure you set the name to 'db'.
 
