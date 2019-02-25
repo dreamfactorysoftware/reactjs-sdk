@@ -749,7 +749,7 @@ var InfoEditForm = React.createClass({
             <div className="form-group"><input type="text" className="form-control email" name="email" placeholder="Email" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)} value={this.props.data.email} /></div>
             <div className="form-group"><input type="text" className="form-control address" name="address" placeholder="Address" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)}  value={this.props.data.address} /></div>
             <div className="form-group"><input type="text" className="form-control city" name="city" placeholder="City" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)}  value={this.props.data.city} /></div>
-            <div className="form-group"><input type="text" className="form-control state" name="state" placeholder="State" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)}  value={this.props.data.email} /></div>
+            <div className="form-group"><input type="text" className="form-control state" name="state" placeholder="State" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)}  value={this.props.data.state} /></div>
             <div className="form-group"><input type="text" className="form-control zip" name="zip" placeholder="Zip" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)} value={this.props.data.zip} /></div>
             <div className="form-group"><input type="text" className="form-control country" name="country" placeholder="Country" onChange={this.handleInfosChange.bind(this, this.props.data.id, this)} value={this.props.data.country} /></div>
         </div>;
